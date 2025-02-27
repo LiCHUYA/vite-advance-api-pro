@@ -174,7 +174,7 @@ let userRoutes = [
 export default userRoutes;
 ```
 
-![image-20250227134504228](./image-20250227134504228.png)
+![](https://pic1.imgdb.cn/item/67c01a1dd0e0a243d407002e.png)
 
 ---
 
@@ -198,7 +198,7 @@ export default userRoutes;
 - **API 文档生成**：描述会显示在自动生成的 API 文档页面上，帮助开发者理解 API 的用途。
 - **控制台日志**：在服务器启动时，描述会显示在控制台日志中，方便开发者查看所有可用的 API。
 
-![image-20250227135917087](./image-20250227135917087.png)
+![image-20250227135917087](https://pic1.imgdb.cn/item/67c01a1cd0e0a243d407002b.png)
 
 ### setup 函数详解
 
@@ -425,7 +425,7 @@ onMounted(async () => {
 });
 ```
 
-![image-20250227135602821](./image-20250227135602821.png)
+![image-20250227135602821](https://pic1.imgdb.cn/item/67c01a1dd0e0a243d407002f.png)
 
 ## 🗄️ 数据库集成指南
 
@@ -501,9 +501,9 @@ export default [
 
 当我们测试连接成功后,看看接口是否正常运行呢
 
-![image-20250227144818963](./image-20250227144818963.png)
+![image-20250227144818963](https://pic1.imgdb.cn/item/67c01a1cd0e0a243d407002c.png)
 
-![image-20250227144840436](./image-20250227144840436.png)
+![image-20250227144840436](https://pic1.imgdb.cn/item/67c01a1dd0e0a243d407002d.png)
 
 #### MongoDB 集成
 
@@ -642,7 +642,7 @@ export const UserSchema = new EntitySchema<User>({
           },
 ```
 
-![image-20250227145924457](./image-20250227145924457.png)
+![image-20250227145924457](https://pic1.imgdb.cn/item/67c01a1fd0e0a243d4070030.png)
 
 ### 完整使用
 

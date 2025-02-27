@@ -2,10 +2,10 @@
 /node_modules
 /.pnp
 .pnp.js
-
+/testplugin
 # Testing
 /coverage
-
+/test-vue
 # Production
 /build
 /dist
