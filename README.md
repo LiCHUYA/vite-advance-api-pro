@@ -26,6 +26,8 @@
 
 ---
 
+github地址: https://github.com/LiCHUYA/vite-advance-api-pro/tree/master
+
 ## 🚀 5分钟快速入门
 
 ### 安装指南
