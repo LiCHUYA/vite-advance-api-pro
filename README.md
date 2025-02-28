@@ -329,6 +329,19 @@ interface DirectModeModule {
 }
 ```
 
+### 日志中间件
+
+当开启日志功能后 请求信息都会在控制台输入
+
+```js
+    createAdvanceApi({
+      prefix: "/api",
+      logger: true
+    }),
+```
+
+![3db437f4-55ba-4ae4-b35e-513831e7032e](./assets/3db437f4-55ba-4ae4-b35e-513831e7032e.jpeg)
+
 ### 2.集成cors
 
 跨域资源共享 (CORS) 是一种机制，允许不同源的网页访问你的 API。vite-advance-api-pro 提供了简单的 CORS 配置选项。
