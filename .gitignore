@@ -9,7 +9,8 @@
 # Production
 /build
 /dist
-
+testplugin
+test-vue
 # Misc
 .DS_Store
 .env.local

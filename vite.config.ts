@@ -15,6 +15,7 @@ export default defineConfig({
     createDebugServer(),
     createAdvanceApi({
       prefix: "/api",
+      logger: true, // 简单的布尔值控制
     }),
   ],
   build: {
@@ -42,10 +43,6 @@ export default defineConfig({
         "chalk",
         "glob",
         "express-async-errors",
-        // Lodash 子模块
-        "lodash/pick",
-        "lodash/omit",
-        "lodash/get",
       ],
     },
     target: "node14",

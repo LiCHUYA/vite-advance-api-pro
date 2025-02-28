@@ -103,14 +103,7 @@ export interface Utils {
   app: Express;
   express: any;
   uuid: () => string;
-  _: {
-    pick: <T>(obj: T, paths: string[]) => Partial<T>;
-    omit: <T extends object | null | undefined>(
-      obj: T,
-      paths: string[]
-    ) => Partial<T>;
-    get: (obj: any, path: string, defaultValue?: any) => any;
-  };
+  _: typeof import("lodash");
   axios: AxiosInstance;
   getRoutes: () => Array<{ method: string; path: string; moduleName?: string }>;
   printRoutes: () => void;
@@ -129,6 +122,7 @@ export interface Utils {
 export interface CreateAdvanceApiOptions {
   prefix?: string;
   cors?: CorsOptions;
+  logger?: boolean; // 简化为布尔值
   routerScan?: {
     paths: string[];
     pattern?: string | string[];

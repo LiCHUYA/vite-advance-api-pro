@@ -1,9 +1,7 @@
 import express, { Request, Response, NextFunction, Router } from "express";
 import cors from "cors";
 import axios from "axios";
-import pick from "lodash/pick";
-import omit from "lodash/omit";
-import get from "lodash/get";
+import lodash from "lodash";
 import { v4 as uuidv4 } from "uuid";
 import "express-async-errors";
 import type { ViteDevServer } from "vite";
@@ -37,7 +35,6 @@ import * as typeorm from "typeorm";
 import mongoose from "mongoose";
 import * as mysql from "mysql2/promise";
 import crypto from "crypto";
-import _ from "lodash";
 
 // 在文件顶部添加类型声明
 declare global {
@@ -834,7 +831,6 @@ async function setupDatabase(config: DatabaseConfig, utilsObj: Utils) {
 
 // 完整的 createAdvanceApi 函数实现
 export async function createAdvanceApi(options: CreateAdvanceApiOptions = {}) {
-  // 创建一个新的 Express 应用
   const app = express();
   const router = express.Router();
   const prefix = options.prefix || "/api";
@@ -848,11 +844,22 @@ export async function createAdvanceApi(options: CreateAdvanceApiOptions = {}) {
   // 解析 URL 编码的请求体
   app.use(express.urlencoded({ extended: true }));
 
-  // 添加调试日志
-  app.use((req, res, next) => {
-    console.log(`[API] ${req.method} ${req.url}`);
-    next();
-  });
+  // 根据配置添加日志中间件
+  if (options.logger) {
+    app.use((req, res, next) => {
+      const startTime = Date.now();
+
+      // 响应结束时记录日志
+      res.on("finish", () => {
+        const duration = Date.now() - startTime;
+        console.log(
+          `[API] ${req.method} ${req.url} ${res.statusCode} ${duration}ms`
+        );
+      });
+
+      next();
+    });
+  }
 
   // 添加响应处理中间件
   app.use((req: Request, res: Response, next: NextFunction) => {
@@ -888,11 +895,7 @@ export async function createAdvanceApi(options: CreateAdvanceApiOptions = {}) {
     app,
     express,
     uuid: uuidv4,
-    _: {
-      pick,
-      omit,
-      get,
-    },
+    _: lodash,
     axios: axios.create(),
     getRoutes: () => routeCollector.getRoutes(),
     printRoutes: () => routeCollector.printRoutes(),
