@@ -3,6 +3,7 @@ import { builtinModules } from "module";
 import dts from "vite-plugin-dts";
 import { createAdvanceApi } from "./src/index";
 import { createDebugServer } from "./src/debug";
+import path from "path";
 
 // 获取所有 Node.js 内置模块
 const nodeBuiltins = builtinModules.concat(
@@ -15,7 +16,15 @@ export default defineConfig({
     createDebugServer(),
     createAdvanceApi({
       prefix: "/api",
-      logger: true, // 简单的布尔值控制
+      logger: true,
+      routerScan: {
+        // 明确指定扫描路径
+        paths: [
+          path.resolve(__dirname, "server"), // 确保这是正确的路径
+        ],
+        // 明确指定文件模式
+        pattern: "**/*.router.ts",
+      },
     }),
   ],
   build: {
