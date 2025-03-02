@@ -7,6 +7,12 @@ import type { Express } from "express";
 import http from "http";
 import { Server } from "socket.io";
 import { ScanCallback } from "./scanner";
+import type {
+  DataSource,
+  EntityTarget,
+  Repository,
+  ObjectLiteral,
+} from "typeorm";
 
 // 自定义请求和响应类型
 export interface ApiRequest extends Request {
@@ -110,19 +116,44 @@ export interface Utils {
   httpServer?: http.Server;
   io?: Server;
   db?: any;
-  // ORM 工具
-  typeorm?: typeof import("typeorm");
+
+  // TypeORM 相关
+  typeorm?: {
+    DataSource: typeof DataSource;
+    getRepository: <T extends ObjectLiteral>(
+      target: EntityTarget<T>
+    ) => Repository<T>;
+    AppDataSource?: DataSource;
+  };
+
+  // 其他数据库
   mongoose?: typeof import("mongoose");
   mysql?: typeof import("mysql2/promise");
-
-  // 添加数据库工具
   dbUtils?: DbUtils;
+}
+
+// 添加 SetupContext 类型
+export interface SetupContext extends Utils {
+  typeorm: NonNullable<Utils["typeorm"]>; // 确保 typeorm 存在
+}
+
+// 添加 SetupResult 类型，用于存储 setup 相关的上下文
+export interface SetupResult {
+  typeorm?: {
+    DataSource: typeof DataSource;
+    getRepository: <T extends ObjectLiteral>(
+      target: EntityTarget<T>
+    ) => Repository<T>;
+    AppDataSource?: DataSource;
+  };
+  utils: Utils;
+  // 其他你想要存储的内容
 }
 
 export interface CreateAdvanceApiOptions {
   prefix?: string;
   cors?: CorsOptions;
-  logger?: boolean; // 简化为布尔值
+  logger?: boolean;
   routerScan?: {
     paths: string[];
     pattern?: string | string[];
@@ -132,8 +163,11 @@ export interface CreateAdvanceApiOptions {
     enable: boolean;
     options?: any;
   };
-  database?: DatabaseConfig;
-  setup?: (utils: Utils) => ModuleConfig[];
+  database?: DatabaseConfig & {
+    onResult?: (error: Error | null, connection?: any) => void; // 数据库连接回调
+  };
+  onSetup?: (setupResult: SetupResult) => void; // 新增 setup 回调
+  setup?: (context: SetupContext) => ModuleConfig[];
 }
 
 // 添加API文档相关的类型定义
@@ -161,8 +195,8 @@ export interface NetworkInterfaceInfo {
 export interface DatabaseConfig {
   type: "mysql" | "mongodb" | "typeorm";
   options: any;
-  required?: boolean;
-  onResult?: (error: Error | null, connection?: any) => void;
+  onResult?: (error: Error | null, connection?: any) => void; // 添加回调函数
+  required?: boolean; // 是否必需，如果为 true 则连接失败时抛出错误
 }
 
 // 模块类型联合

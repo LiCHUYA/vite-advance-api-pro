@@ -19,6 +19,8 @@ import type {
   ObjectModeModule,
   DirectModeModule,
   ScanCallback,
+  SetupResult,
+  SetupContext,
 } from "./types";
 import { CommonResponse, Code, CodeMessage } from "./response";
 import chalk from "chalk";
@@ -754,44 +756,9 @@ async function setupDatabase(config: DatabaseConfig, utilsObj: Utils) {
         break;
 
       case "typeorm":
-        utilsObj.typeorm = driver;
-        db = await initTypeorm(config.options, driver);
-
-        // 添加 TypeORM 常用操作
-        utilsObj.dbUtils = {
-          getRepository: (entity: any) => db.getRepository(entity),
-          findById: async (entity: any, id: number | string) => {
-            const repository = db.getRepository(entity);
-            return await repository.findOne({ where: { id } });
-          },
-          findAll: async (entity: any, where = {}) => {
-            const repository = db.getRepository(entity);
-            return await repository.find({ where });
-          },
-          create: async (entity: any, data: Record<string, any>) => {
-            const repository = db.getRepository(entity);
-            const newEntity = repository.create(data);
-            return await repository.save(newEntity);
-          },
-          update: async (
-            entity: any,
-            id: number | string,
-            data: Record<string, any>
-          ) => {
-            const repository = db.getRepository(entity);
-            await repository.update(id, data);
-            return await repository.findOne({ where: { id } });
-          },
-          delete: async (entity: any, id: number | string) => {
-            const repository = db.getRepository(entity);
-            const entityToRemove = await repository.findOne({ where: { id } });
-            if (!entityToRemove) return null;
-            return await repository.remove(entityToRemove);
-          },
-          query: async (sql: string, parameters?: any[]) => {
-            return await db.query(sql, parameters);
-          },
-        };
+        const typeormUtils = await initTypeorm(config.options, driver);
+        utilsObj.typeorm = typeormUtils;
+        db = typeormUtils.AppDataSource;
         break;
 
       default:
@@ -1017,7 +984,23 @@ export async function createAdvanceApi(options: CreateAdvanceApiOptions = {}) {
   // 设置自定义路由
   if (options.setup) {
     console.log(`\n🔧 ${chalk.blue("设置自定义路由...")}`);
-    const modules = options.setup(utils);
+
+    // 确保 typeorm 存在
+    const setupContext: SetupContext = {
+      ...utils,
+      typeorm: utils.typeorm!,
+    };
+
+    const modules = options.setup(setupContext);
+
+    // 调用 onSetup 回调
+    if (options.onSetup) {
+      const setupResult: SetupResult = {
+        typeorm: utils.typeorm,
+        utils: setupContext,
+      };
+      options.onSetup(setupResult);
+    }
 
     modules.forEach((module) => {
       if (module.type === "object") {

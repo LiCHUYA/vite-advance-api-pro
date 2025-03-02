@@ -1,6 +1,6 @@
 {
   "name": "vite-advance-api-pro",
-  "version": "0.0.4",
+  "version": "0.0.9",
   "description": "Advanced API plugin for Vite with multiple routing styles, ORM support, and Socket.IO integration",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",

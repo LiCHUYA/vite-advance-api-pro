@@ -5,6 +5,7 @@ import { pathToFileURL } from "node:url";
 import type { RouteDefinition } from "./types";
 import chalk from "chalk";
 import { build } from "esbuild";
+import crypto from "crypto";
 
 export interface ScanCallback {
   onStart?: (paths: string[]) => void;
@@ -21,10 +22,29 @@ async function loadTsFile(filePath: string): Promise<any> {
       entryPoints: [filePath],
       bundle: true,
       write: false,
-      format: "cjs",
+      format: "esm",
       target: "node14",
       platform: "node",
       outfile: "out.js",
+      external: [
+        // 排除 Node.js 内置模块
+        "node:*",
+        "crypto",
+        "fs",
+        "path",
+        // 排除可能导致问题的依赖
+        "@mapbox/node-pre-gyp",
+        "mock-aws-s3",
+        "aws-sdk",
+        "nock",
+        // 其他可能需要排除的模块
+        "typeorm",
+        "bcrypt",
+        "jsonwebtoken",
+      ],
+      loader: {
+        ".html": "text", // 处理 HTML 文件
+      },
     });
 
     // 获取编译后的代码
@@ -33,32 +53,30 @@ async function loadTsFile(filePath: string): Promise<any> {
       throw new Error("编译失败：没有输出文件");
     }
 
-    // 使用 Function 构造器替代 eval
-    const compiledCode = outputFiles[0].text;
-    const moduleFactory = new Function(
-      "exports",
-      "require",
-      "module",
-      "__filename",
-      "__dirname",
-      compiledCode
+    // 创建临时文件
+    const tempDir = path.join(
+      process.cwd(),
+      "node_modules",
+      ".vite-advance-api-temp"
     );
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
 
-    // 创建模块上下文
-    const exports = {};
-    const module = { exports };
-
-    // 执行模块代码
-    moduleFactory.call(
-      {},
-      exports,
-      require,
-      module,
-      filePath,
-      path.dirname(filePath)
+    const tempFile = path.join(
+      tempDir,
+      `${crypto.randomBytes(16).toString("hex")}.mjs`
     );
+    fs.writeFileSync(tempFile, outputFiles[0].text);
 
-    return module.exports;
+    try {
+      // 使用 import() 动态导入
+      const module = await import(pathToFileURL(tempFile).href);
+      return module;
+    } finally {
+      // 清理临时文件
+      fs.unlinkSync(tempFile);
+    }
   } catch (error) {
     throw new Error(
       `编译 TypeScript 文件失败: ${error instanceof Error ? error.message : String(error)}`

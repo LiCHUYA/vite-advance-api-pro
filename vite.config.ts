@@ -11,22 +11,7 @@ const nodeBuiltins = builtinModules.concat(
 );
 
 export default defineConfig({
-  plugins: [
-    dts(),
-    createDebugServer(),
-    createAdvanceApi({
-      prefix: "/api",
-      logger: true,
-      routerScan: {
-        // 明确指定扫描路径
-        paths: [
-          path.resolve(__dirname, "server"), // 确保这是正确的路径
-        ],
-        // 明确指定文件模式
-        pattern: "**/*.router.ts",
-      },
-    }),
-  ],
+  plugins: [dts(), createDebugServer()],
   build: {
     ssr: true,
     lib: {
