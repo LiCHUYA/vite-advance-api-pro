@@ -132,22 +132,14 @@ export interface Utils {
   dbUtils?: DbUtils;
 }
 
-// 添加 SetupContext 类型
+// 修改 SetupContext 类型，直接继承 Utils
 export interface SetupContext extends Utils {
   typeorm: NonNullable<Utils["typeorm"]>; // 确保 typeorm 存在
 }
 
-// 添加 SetupResult 类型，用于存储 setup 相关的上下文
-export interface SetupResult {
-  typeorm?: {
-    DataSource: typeof DataSource;
-    getRepository: <T extends ObjectLiteral>(
-      target: EntityTarget<T>
-    ) => Repository<T>;
-    AppDataSource?: DataSource;
-  };
-  utils: Utils;
-  // 其他你想要存储的内容
+// 修改 SetupResult 类型，不再嵌套 utils
+export interface SetupResult extends SetupContext {
+  // 可以添加其他你想要存储的内容
 }
 
 export interface CreateAdvanceApiOptions {

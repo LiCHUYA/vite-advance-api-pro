@@ -995,11 +995,8 @@ export async function createAdvanceApi(options: CreateAdvanceApiOptions = {}) {
 
     // 调用 onSetup 回调
     if (options.onSetup) {
-      const setupResult: SetupResult = {
-        typeorm: utils.typeorm,
-        utils: setupContext,
-      };
-      options.onSetup(setupResult);
+      // 直接传递 setupContext，不再包装
+      options.onSetup(setupContext);
     }
 
     modules.forEach((module) => {
